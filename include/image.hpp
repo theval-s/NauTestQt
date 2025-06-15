@@ -18,21 +18,26 @@ class Image {
 
   public:
     //Image parameters
-    QTransform _transform;
-    float _rotation;
-    float _opacity;
-    bool _showBorder = false;
-    QColor _borderColor = Qt::black;
-    bool _isVisible = true;
+    QTransform transform;
+    float rotation = 0;
+    float opacity = 1;
+    bool showBorder = false;
+    QColor borderColor = Qt::black;
+    bool isVisible = true;
 
-    explicit Image(const QFileInfo &path)
+    Image(const QString &path)
         : _fileInfo(path), _name(_fileInfo.completeBaseName()),
           _img(QImage(_fileInfo.absoluteFilePath())) {
         if (!_fileInfo.exists() || _img.isNull()) {
             throw std::invalid_argument(std::format(
-                "Image.hpp: Failed to open file {}", _fileInfo.absoluteFilePath()));
+                "Image.hpp: Failed to open file {}", _fileInfo.filesystemAbsoluteFilePath().string()));
         }
     }
+
+    QFileInfo getFileInfo() const { return _fileInfo; }
+    QString getName() const { return _name; }
+    QImage getImage() const { return _img; }
+
 
 };
 
