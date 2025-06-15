@@ -14,6 +14,7 @@ find_package(Qt6 COMPONENTS
         REQUIRED)
 
 add_executable(NauTest main.cpp)
+target_include_directories(NauTest PRIVATE include)
 target_link_libraries(NauTest
         Qt::Core
         Qt::Gui
