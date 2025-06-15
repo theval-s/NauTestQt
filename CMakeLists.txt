@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 3.24)
 project(NauTest)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -13,11 +13,15 @@ find_package(Qt6 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(NauTest main.cpp)
-target_include_directories(NauTest PRIVATE include)
-target_link_libraries(NauTest
+add_executable(NauTest main.cpp
+    src/viewport_widget.cpp
+    include/viewport_widget.hpp)
+
+target_include_directories(NauTest PUBLIC include)
+target_link_libraries(NauTest PUBLIC
         Qt::Core
         Qt::Gui
         Qt::Widgets
 )
+qt_finalize_executable(NauTest)
 
