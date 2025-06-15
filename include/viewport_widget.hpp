@@ -3,14 +3,14 @@
 //
 
 #pragma once
+#include "image.hpp"
+
 #include <QGraphicsPixmapItem>
 #include <QGraphicsView>
 #include <QWheelEvent>
 
-#include "image.hpp"
-
-
 namespace App {
+// TODO: Add ImagesChanged signal and slot
 constexpr float ZOOM_VALUE = 0.1f; // get from settings later
 constexpr float ZOOM_MIN = 0.1f;
 constexpr float ZOOM_MAX = 100.0f;
@@ -21,6 +21,7 @@ class ViewportWidget : public QGraphicsView {
     float _currentScale = 1.0f;
     QGraphicsScene _scene;
     std::vector<std::pair<Image, QGraphicsPixmapItem *>> _items;
+    qreal maxHeight = 0, maxWidth = 0;
 
     void wheelEvent(QWheelEvent *event) override;
 
@@ -31,6 +32,8 @@ class ViewportWidget : public QGraphicsView {
     void addImage(const Image &image);
     float getScale() const { return _currentScale; }
     void setScale(float scale);
+    [[nodiscard]] std::vector<Image> getImages() const;
+    void updateSceneRect();
 };
 
 } // namespace App
