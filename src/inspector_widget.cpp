@@ -140,6 +140,8 @@ void InspectorWidget::createAppearanceGroup() {
     _zValue = new QDoubleSpinBox(appearance_widget);
     _zValue->setSingleStep(1.f);
     _zValue->setValue(0);
+    _zValue->setMinimum(-100.f);
+    _zValue->setMaximum(100.f);
     connect(_zValue, &QDoubleSpinBox::valueChanged, this,
             &InspectorWidget::zValueModified);
     appearance_layout->addWidget(_zValue);

@@ -2,9 +2,12 @@
 // Created by Volkov Sergey on 16/06/2025.
 //
 
+#include "saving_manager.hpp"
+
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QMenuBar>
+#include <QMessageBox>
 #include <QStatusBar>
 #include <QVBoxLayout>
 #include <main_window.hpp>
@@ -32,6 +35,8 @@ void MainWindow::setupUi() {
     QMenu *file_menu = menu->addMenu("File");
     _openAction = new QAction("Open", this);
     file_menu->addAction(_openAction);
+    _saveAction = new QAction("Save", this);
+    file_menu->addAction(_saveAction);
     setMenuBar(menu);
 
     //status_bar initialisation
@@ -47,6 +52,36 @@ void MainWindow::setupUi() {
     status_bar->addWidget(_scaleLabel);
     setStatusBar(status_bar);
 }
+void MainWindow::openFile() {
+    QString file = QFileDialog::getOpenFileName(
+        this, "Open...", QDir::homePath(),
+        "Supported files (*.png *.jpg *jpeg *webm *.bmp *.json)");
+    if (!file.isEmpty() && _viewport) {
+        try {
+            if (file.endsWith(".json")) {
+                std::vector<Image> images = SavingManager::loadProject(file);
+                if (images.size() > 0) _viewport->setImage(images[0]);
+                if (images.size() > 1) for (size_t i = 1; i < images.size(); i++) _viewport->addImage(images[i]);
+            } else {
+                Image img(file);
+                _viewport->addImage(img);
+            }
+        } catch (const std::exception &e) {
+            QMessageBox::critical(this, "Error!", e.what());
+        }
+    }
+}
+void MainWindow::saveFile() {
+    if (_viewport) try {
+        QString file = QFileDialog::getSaveFileName(this,"Save to...", QDir::homePath(),
+        "JSON File (*.json)");
+        qDebug() << "Saving to..." << file;
+        if (!file.endsWith(".json")) file+=".json";
+        SavingManager::saveProject(_viewport->getImages(), file);
+    } catch (const std::exception &e) {
+        QMessageBox::critical(this, "Error!", e.what());
+    }
+}
 void MainWindow::connectSignals() {
     connect(this, &MainWindow::activeImageChanged, this,
             &MainWindow::updatePathLabel);
@@ -54,15 +89,8 @@ void MainWindow::connectSignals() {
         //to viewport
         connect(this, &MainWindow::zoomValueChanged, _viewport,
                 &ViewportWidget::setMouseZoom);
-        connect(_openAction, &QAction::triggered, [this]() {
-            QString file = QFileDialog::getOpenFileName(
-                this, "Open...", QDir::homePath(),
-                "Images (*.png *.jpg *jpeg *webm)");
-            if (!file.isEmpty()) {
-                Image img(file);
-                _viewport->addImage(img);
-            }
-        });
+        connect(_openAction, &QAction::triggered, this, &MainWindow::openFile);
+        connect(_saveAction, &QAction::triggered, this, &MainWindow::saveFile);
 
         //from viewport
         connect(_viewport, &ViewportWidget::imagesChanged, this,

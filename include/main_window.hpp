@@ -10,7 +10,6 @@
 #include <QAction>
 #include <QLabel>
 #include <QMainWindow>
-#include <QSettings>
 
 namespace App {
 class MainWindow : public QMainWindow {
@@ -26,6 +25,7 @@ class MainWindow : public QMainWindow {
 
     //menu_bar actions
     QAction *_openAction;
+    QAction *_saveAction;
     //status_bar widgets:
     QLabel *_pathLabel;
     QLabel *_resolutionLabel;
@@ -44,6 +44,8 @@ class MainWindow : public QMainWindow {
     void updateResolutionLabel();
     void updateDisplayOptions(const DisplayOptions &options);
     void handleImageUpdate(const std::vector<Image> &images);
+    void openFile();
+    void saveFile();
   signals:
     void zoomValueChanged(float value);
     void activeImageChanged(const Image &image);
