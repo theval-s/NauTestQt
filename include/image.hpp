@@ -4,9 +4,9 @@
 
 #pragma once
 #include <QFileInfo>
+#include <QGraphicsPixmapItem>
 #include <QImage>
 #include <QString>
-#include <QGraphicsPixmapItem>
 
 namespace App {
 
@@ -29,16 +29,15 @@ class Image {
         : _fileInfo(path), _name(_fileInfo.completeBaseName()),
           _img(QImage(_fileInfo.absoluteFilePath())) {
         if (!_fileInfo.exists() || _img.isNull()) {
-            throw std::invalid_argument(std::format(
-                "Image.hpp: Failed to open file {}", _fileInfo.filesystemAbsoluteFilePath().string()));
+            throw std::invalid_argument(
+                std::format("Image.hpp: Failed to open file {}",
+                            _fileInfo.filesystemAbsoluteFilePath().string()));
         }
     }
 
     QFileInfo getFileInfo() const { return _fileInfo; }
     QString getName() const { return _name; }
     QImage getImage() const { return _img; }
-
-
 };
 
 } // namespace App

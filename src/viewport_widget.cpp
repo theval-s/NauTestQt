@@ -105,9 +105,9 @@ std::vector<Image> ViewportWidget::getImages() const {
 }
 void ViewportWidget::updateSceneRect() {
     const QRectF viewRect = mapToScene(viewport()->rect()).boundingRect();
-    QRectF pixmapRect(0,0,_maxWidth,_maxHeight);
-    qreal marginX = viewRect.width() *0.5f;
-    qreal marginY = viewRect.height() *0.5f;
+    QRectF pixmapRect(0, 0, _maxWidth, _maxHeight);
+    qreal marginX = viewRect.width() * 0.5f;
+    qreal marginY = viewRect.height() * 0.5f;
     pixmapRect = pixmapRect.adjusted(-marginX, -marginY, marginX, marginY);
     _scene.setSceneRect(pixmapRect);
 }

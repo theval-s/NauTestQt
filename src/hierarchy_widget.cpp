@@ -16,4 +16,4 @@ void HierarchyWidget::updateList(const std::vector<Image> &images) {
     }
     this->blockSignals(false);
 }
-} // App
+} // namespace App

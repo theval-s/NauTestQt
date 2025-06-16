@@ -24,7 +24,6 @@ class MainWindow : public QMainWindow {
     void setupUi();
     void connectSignals();
 
-
     //menu_bar actions
     QAction *_openAction;
     //status_bar widgets:
@@ -40,13 +39,13 @@ class MainWindow : public QMainWindow {
     MainWindow(int width, int height, QWidget *parent = nullptr);
 
   public slots:
-    void updatePathLabel(const Image& image);
+    void updatePathLabel(const Image &image);
     void updateScaleLabel(float scale);
     void updateResolutionLabel();
     void updateDisplayOptions(const DisplayOptions &options);
     void handleImageUpdate(const std::vector<Image> &images);
-    signals:
+  signals:
     void zoomValueChanged(float value);
-    void activeImageChanged(const Image& image);
+    void activeImageChanged(const Image &image);
 };
 } // namespace App

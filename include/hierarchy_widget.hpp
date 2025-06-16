@@ -9,21 +9,18 @@
 #include <QListWidget>
 namespace App {
 
-class HierarchyWidget: public QListWidget {
+class HierarchyWidget : public QListWidget {
     Q_OBJECT
-public:
-    HierarchyWidget(QWidget* parent = nullptr) {
+  public:
+    HierarchyWidget(QWidget *parent = nullptr) {
         setParent(parent);
         this->setSelectionBehavior(SelectItems);
         this->setSelectionMode(QAbstractItemView::SingleSelection);
         this->setDragEnabled(false);
     }
 
-    public slots:
+  public slots:
     void updateList(const std::vector<Image> &images);
-    signals:
-
-
 };
 
-} // App
+} // namespace App

@@ -46,13 +46,13 @@ class ViewportWidget : public QGraphicsView {
     void scaleChanged(float newScale);
   public slots:
     void setScale(float scale);
-    void zoomIn(float scale=1+0.1f);
-    void zoomOut(float scale=1-0.1f);
-    void setTransform(size_t index=0, QTransform pixmapTransform = QTransform());
-    void setOpacity(size_t index=0, float opacity = 1.0f);
-    void setItemVisible(size_t index=0, bool visible = 1);
-    void setItemZValue(size_t index=0, float zValue = 0);
+    void zoomIn(float scale = 1 + 0.1f);
+    void zoomOut(float scale = 1 - 0.1f);
+    void setTransform(size_t index = 0,
+                      QTransform pixmapTransform = QTransform());
+    void setOpacity(size_t index = 0, float opacity = 1.0f);
+    void setItemVisible(size_t index = 0, bool visible = 1);
+    void setItemZValue(size_t index = 0, float zValue = 0);
     void setMouseZoom(float zoom);
-
 };
 } // namespace App

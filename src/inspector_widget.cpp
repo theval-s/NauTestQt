@@ -11,7 +11,7 @@
 namespace App {
 
 void InspectorWidget::setupUi() {
-    QVBoxLayout* main_layout = new QVBoxLayout(this);
+    QVBoxLayout *main_layout = new QVBoxLayout(this);
     QWidget *content_widget = new QWidget(this);
     _contentLayout = new QVBoxLayout(content_widget);
     _contentLayout->setSpacing(2);
@@ -113,7 +113,8 @@ void InspectorWidget::createAppearanceGroup() {
     _itemVisible = new QCheckBox("Visible");
     _itemVisible->setChecked(true);
     appearance_layout->addWidget(_itemVisible);
-    connect(_itemVisible, &QCheckBox::toggled, this, &InspectorWidget::itemVisibleModified);
+    connect(_itemVisible, &QCheckBox::toggled, this,
+            &InspectorWidget::itemVisibleModified);
 
     //Opacity
     QHBoxLayout *opacity_layout = new QHBoxLayout();
@@ -125,7 +126,7 @@ void InspectorWidget::createAppearanceGroup() {
     _opacity->setValue(100.0f);
     _opacity->setRange(0, 100);
     connect(_opacity, &QSlider::valueChanged, this, [this]() {
-        const qreal new_opacity = _opacity->value()/100.0f;
+        const qreal new_opacity = _opacity->value() / 100.0f;
         emit opacityModified(new_opacity);
     });
     opacity_layout->addWidget(_opacity);
@@ -139,9 +140,9 @@ void InspectorWidget::createAppearanceGroup() {
     _zValue = new QDoubleSpinBox(appearance_widget);
     _zValue->setSingleStep(1.f);
     _zValue->setValue(0);
-    connect(_zValue, &QDoubleSpinBox::valueChanged, this, &InspectorWidget::zValueModified);
+    connect(_zValue, &QDoubleSpinBox::valueChanged, this,
+            &InspectorWidget::zValueModified);
     appearance_layout->addWidget(_zValue);
-
 }
 void InspectorWidget::createDisplayGroup() {
     QWidget *display_widget = new QWidget(this);
@@ -177,7 +178,7 @@ void InspectorWidget::createDisplayGroup() {
     zoom_layout->addWidget(_zoom);
 }
 float InspectorWidget::roundToStep(float val, float step) {
-    return std::round(val/step) * step;
+    return std::round(val / step) * step;
 }
 void InspectorWidget::onTransformPropertyChanged() {
     QTransform transform;
@@ -206,7 +207,7 @@ void InspectorWidget::loadImage(const Image &image) {
     _scaleY->setValue(roundToStep(std::hypot(tf.m21(), tf.m22()), 0.1f));
 
     double rot_radians = std::atan2(tf.m21(), tf.m11());
-    _rotation->setValue(roundToStep(rot_radians*(180.0 / M_PI), 0.5f));
+    _rotation->setValue(roundToStep(rot_radians * (180.0 / M_PI), 0.5f));
     _zValue->setValue(image.zValue);
 }
 

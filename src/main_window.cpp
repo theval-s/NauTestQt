@@ -2,12 +2,12 @@
 // Created by Volkov Sergey on 16/06/2025.
 //
 
-#include <main_window.hpp>
+#include <QFileDialog>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QMenuBar>
 #include <QStatusBar>
-#include <QFileDialog>
+#include <QVBoxLayout>
+#include <main_window.hpp>
 
 namespace App {
 
@@ -19,7 +19,7 @@ void MainWindow::setupUi() {
     main_layout->addLayout(side_layout);
 
     if (_hierarchy) {
-        side_layout->addWidget(_hierarchy,1);
+        side_layout->addWidget(_hierarchy, 1);
     }
 
     if (_inspector) {
@@ -48,71 +48,88 @@ void MainWindow::setupUi() {
     setStatusBar(status_bar);
 }
 void MainWindow::connectSignals() {
-        connect(this, &MainWindow::activeImageChanged, this, &MainWindow::updatePathLabel);
+    connect(this, &MainWindow::activeImageChanged, this,
+            &MainWindow::updatePathLabel);
     if (_viewport) {
         //to viewport
-        connect(this, &MainWindow::zoomValueChanged, _viewport, &ViewportWidget::setMouseZoom);
+        connect(this, &MainWindow::zoomValueChanged, _viewport,
+                &ViewportWidget::setMouseZoom);
         connect(_openAction, &QAction::triggered, [this]() {
-                    QString file = QFileDialog::getOpenFileName(this, "Open...", QDir::homePath(), "Images (*.png *.jpg *jpeg *webm)");
-                    if (!file.isEmpty()) {
-                        Image img(file);
-                        _viewport->addImage(img);
-                    }
-                });
+            QString file = QFileDialog::getOpenFileName(
+                this, "Open...", QDir::homePath(),
+                "Images (*.png *.jpg *jpeg *webm)");
+            if (!file.isEmpty()) {
+                Image img(file);
+                _viewport->addImage(img);
+            }
+        });
 
         //from viewport
-        connect(_viewport, &ViewportWidget::imagesChanged, this, &MainWindow::handleImageUpdate);
-        connect(_viewport, &ViewportWidget::scaleChanged, this, &MainWindow::updateScaleLabel);
-        connect(_viewport, &ViewportWidget::imagesChanged, this, &MainWindow::updateResolutionLabel);
-        if (_hierarchy) connect(_viewport, &ViewportWidget::imagesChanged, _hierarchy, &HierarchyWidget::updateList);
+        connect(_viewport, &ViewportWidget::imagesChanged, this,
+                &MainWindow::handleImageUpdate);
+        connect(_viewport, &ViewportWidget::scaleChanged, this,
+                &MainWindow::updateScaleLabel);
+        connect(_viewport, &ViewportWidget::imagesChanged, this,
+                &MainWindow::updateResolutionLabel);
+        if (_hierarchy)
+            connect(_viewport, &ViewportWidget::imagesChanged, _hierarchy,
+                    &HierarchyWidget::updateList);
     }
     if (_inspector) {
         //to inspector
-        connect(this, &MainWindow::activeImageChanged, _inspector, &InspectorWidget::loadImage);
+        connect(this, &MainWindow::activeImageChanged, _inspector,
+                &InspectorWidget::loadImage);
 
         //from inspector
-        connect(_inspector, &InspectorWidget::displayOptionsModified, this, &MainWindow::updateDisplayOptions);
+        connect(_inspector, &InspectorWidget::displayOptionsModified, this,
+                &MainWindow::updateDisplayOptions);
         if (_viewport) {
-            connect(_inspector, &InspectorWidget::transformModified, _viewport, [this](const QTransform &transform) {
-            _viewport->setTransform(imageIndex, transform);
-        });
-            connect(_inspector, &InspectorWidget::itemVisibleModified, this, [this](bool visible) {
-            _viewport->setItemVisible(imageIndex, visible);
-        });
-            connect(_inspector, &InspectorWidget::opacityModified, this, [this](float opacity) {
-                _viewport->setOpacity(imageIndex, opacity);
-            });
-            connect(_inspector, &InspectorWidget::zValueModified, this, [this](float zValue) {
-                _viewport->setItemZValue(imageIndex, zValue);
-            });
+            connect(_inspector, &InspectorWidget::transformModified, _viewport,
+                    [this](const QTransform &transform) {
+                        _viewport->setTransform(imageIndex, transform);
+                    });
+            connect(_inspector, &InspectorWidget::itemVisibleModified, this,
+                    [this](bool visible) {
+                        _viewport->setItemVisible(imageIndex, visible);
+                    });
+            connect(_inspector, &InspectorWidget::opacityModified, this,
+                    [this](float opacity) {
+                        _viewport->setOpacity(imageIndex, opacity);
+                    });
+            connect(_inspector, &InspectorWidget::zValueModified, this,
+                    [this](float zValue) {
+                        _viewport->setItemZValue(imageIndex, zValue);
+                    });
         }
-
     }
     if (_hierarchy) {
-        connect(_hierarchy, &QListWidget::currentRowChanged, this, [this](int row) {
-            this->imageIndex = row;
-            if (_viewport) emit activeImageChanged(_viewport->getImages().at(imageIndex));
-        });
+        connect(_hierarchy, &QListWidget::currentRowChanged, this,
+                [this](int row) {
+                    this->imageIndex = row;
+                    if (_viewport)
+                        emit activeImageChanged(
+                            _viewport->getImages().at(imageIndex));
+                });
     }
 }
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), _viewport(new ViewportWidget(this)),
- _inspector(new InspectorWidget), _hierarchy(new HierarchyWidget){
+      _inspector(new InspectorWidget), _hierarchy(new HierarchyWidget) {
     setupUi();
     connectSignals();
 }
 MainWindow::MainWindow(int width, int height, QWidget *parent)
     : QMainWindow(parent), _viewport(new ViewportWidget(this)),
-_inspector(new InspectorWidget), _hierarchy(new HierarchyWidget){
+      _inspector(new InspectorWidget), _hierarchy(new HierarchyWidget) {
     this->resize(width, height);
     setupUi();
     connectSignals();
 }
-void MainWindow::updatePathLabel(const Image& image) {
+void MainWindow::updatePathLabel(const Image &image) {
     _pathLabel->setText(image.getFileInfo().absoluteFilePath());
 }
 void MainWindow::updateScaleLabel(float scale) {
-    _scaleLabel->setText(QString::number(scale*100, 'f',0) + "%");
+    _scaleLabel->setText(QString::number(scale * 100, 'f', 0) + "%");
 }
 void MainWindow::updateResolutionLabel() {
     QRect rect = _viewport->getImageRectSize();
@@ -125,11 +142,13 @@ void MainWindow::updateDisplayOptions(const DisplayOptions &options) {
         if (options.showPath) {
             _pathLabel->setVisible(true);
             if (_viewport)
-                connect(this, &MainWindow::activeImageChanged, this, &MainWindow::updatePathLabel);
+                connect(this, &MainWindow::activeImageChanged, this,
+                        &MainWindow::updatePathLabel);
         } else {
             _pathLabel->setVisible(false);
             if (_viewport)
-                disconnect(this, &MainWindow::activeImageChanged, this, &MainWindow::updatePathLabel);
+                disconnect(this, &MainWindow::activeImageChanged, this,
+                           &MainWindow::updatePathLabel);
         }
     }
     if (options.showResolution != _displayOptions.showResolution) {
@@ -162,4 +181,4 @@ void MainWindow::handleImageUpdate(const std::vector<Image> &images) {
     //     emit activeImageChanged(images[imageIndex]);
     // }
 }
-} // App
+} // namespace App

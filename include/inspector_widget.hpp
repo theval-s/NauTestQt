@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "image.hpp"
 #include "display_options.hpp"
+#include "image.hpp"
 
 #include <QCheckBox>
 #include <QDoubleSpinBox>
@@ -15,21 +15,20 @@
 
 namespace App {
 
-class InspectorWidget: public QWidget {
-Q_OBJECT
-    QVBoxLayout* _contentLayout = nullptr;
-
+class InspectorWidget : public QWidget {
+    Q_OBJECT
+    QVBoxLayout *_contentLayout = nullptr;
 
     //Transform value widgets
-    QDoubleSpinBox* _posX = nullptr, *_posY = nullptr;
-    QDoubleSpinBox* _scaleX = nullptr, *_scaleY = nullptr;
-    QDoubleSpinBox* _rotation = nullptr;
-    QCheckBox* _flipX = nullptr, *_flipY = nullptr;
+    QDoubleSpinBox *_posX = nullptr, *_posY = nullptr;
+    QDoubleSpinBox *_scaleX = nullptr, *_scaleY = nullptr;
+    QDoubleSpinBox *_rotation = nullptr;
+    QCheckBox *_flipX = nullptr, *_flipY = nullptr;
 
     //Appearance value widgets
-    QSlider* _opacity = nullptr;
-    QCheckBox* _itemVisible = nullptr;
-    QDoubleSpinBox* _zValue = nullptr;
+    QSlider *_opacity = nullptr;
+    QCheckBox *_itemVisible = nullptr;
+    QDoubleSpinBox *_zValue = nullptr;
 
     //Display Options value widgets
     QCheckBox *_showPath = nullptr, *_showResolution = nullptr;
@@ -42,7 +41,7 @@ Q_OBJECT
 
     float roundToStep(float val, float step);
 
-public:
+  public:
     explicit InspectorWidget(QWidget *parent = nullptr) {
         setParent(parent);
         setupUi();
@@ -50,20 +49,19 @@ public:
         createAppearanceGroup();
         createDisplayGroup();
     }
-    signals:
+  signals:
     void transformModified(const QTransform &transform);
     void opacityModified(qreal opacity);
     void itemVisibleModified(bool visible);
     void zValueModified(double zValue);
     void displayOptionsModified(const DisplayOptions options);
 
-    private slots:
+  private slots:
     void onTransformPropertyChanged();
     void onDisplayOptionsChanged();
 
-    public slots:
+  public slots:
     void loadImage(const Image &image);
-
 };
 
-} // App
+} // namespace App
