@@ -2,7 +2,7 @@
 Uses QGraphics framework to display images.
 
 ## Dependancies
-Qt6 (Core, Widgets) - qt6-base/qt6-base-devel or qt6 depending on your package manager  
+Qt6.7+ (Core, Widgets) - qt6-base/qt6-base-devel or qt6 depending on your package manager  
 CMake (I've set minimum required to 3.24 but I'm pretty sure it can be built with lower)
 
 ## Building
