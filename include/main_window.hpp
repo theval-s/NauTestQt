@@ -19,6 +19,7 @@ class MainWindow : public QMainWindow {
     //Displayed widgets
     ViewportWidget *_viewport = nullptr;
     InspectorWidget *_inspector = nullptr;
+    HierarchyWidget *_hierarchy = nullptr;
 
     void setupUi();
     void connectSignals();

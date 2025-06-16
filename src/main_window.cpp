@@ -18,11 +18,14 @@ void MainWindow::setupUi() {
     QVBoxLayout *side_layout = new QVBoxLayout();
     main_layout->addLayout(side_layout);
 
+    if (_hierarchy) {
+        side_layout->addWidget(_hierarchy,1);
+    }
+
     if (_inspector) {
         side_layout->addWidget(_inspector, 2);
     }
     if (_viewport) main_layout->addWidget(_viewport, 2);
-
 
     //menu initialisation
     QMenuBar *menu = new QMenuBar(this);
@@ -61,6 +64,7 @@ void MainWindow::connectSignals() {
         connect(_viewport, &ViewportWidget::imagesChanged, this, &MainWindow::handleImageUpdate);
         connect(_viewport, &ViewportWidget::scaleChanged, this, &MainWindow::updateScaleLabel);
         connect(_viewport, &ViewportWidget::imagesChanged, this, &MainWindow::updateResolutionLabel);
+        if (_hierarchy) connect(_viewport, &ViewportWidget::imagesChanged, _hierarchy, &HierarchyWidget::updateList);
     }
     if (_inspector) {
         //to inspector
@@ -78,19 +82,28 @@ void MainWindow::connectSignals() {
             connect(_inspector, &InspectorWidget::opacityModified, this, [this](float opacity) {
                 _viewport->setOpacity(imageIndex, opacity);
             });
+            connect(_inspector, &InspectorWidget::zValueModified, this, [this](float zValue) {
+                _viewport->setItemZValue(imageIndex, zValue);
+            });
         }
-    }
 
+    }
+    if (_hierarchy) {
+        connect(_hierarchy, &QListWidget::currentRowChanged, this, [this](int row) {
+            this->imageIndex = row;
+            if (_viewport) emit activeImageChanged(_viewport->getImages().at(imageIndex));
+        });
+    }
 }
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), _viewport(new ViewportWidget(this)),
- _inspector(new InspectorWidget){
+ _inspector(new InspectorWidget), _hierarchy(new HierarchyWidget){
     setupUi();
     connectSignals();
 }
 MainWindow::MainWindow(int width, int height, QWidget *parent)
     : QMainWindow(parent), _viewport(new ViewportWidget(this)),
-_inspector(new InspectorWidget){
+_inspector(new InspectorWidget), _hierarchy(new HierarchyWidget){
     this->resize(width, height);
     setupUi();
     connectSignals();
@@ -113,13 +126,10 @@ void MainWindow::updateDisplayOptions(const DisplayOptions &options) {
             _pathLabel->setVisible(true);
             if (_viewport)
                 connect(this, &MainWindow::activeImageChanged, this, &MainWindow::updatePathLabel);
-            //if(_hierarchy)
         } else {
             _pathLabel->setVisible(false);
             if (_viewport)
                 disconnect(this, &MainWindow::activeImageChanged, this, &MainWindow::updatePathLabel);
-
-            //if(_hierarchy)
         }
     }
     if (options.showResolution != _displayOptions.showResolution) {
@@ -147,9 +157,9 @@ void MainWindow::handleImageUpdate(const std::vector<Image> &images) {
         _scaleLabel->setText("Scale");
         imageIndex = 0;
     }
-    else /*if(!_hierarchy)*/ {
-        imageIndex = images.size() - 1;
-        emit activeImageChanged(images[imageIndex]);
-    }
+    // else {
+    //     imageIndex = images.size() - 1;
+    //     emit activeImageChanged(images[imageIndex]);
+    // }
 }
 } // App
