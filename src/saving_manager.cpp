@@ -23,13 +23,16 @@ void SavingManager::saveProject(const std::vector<Image> &images,
     file.write(doc.toJson());
 }
 std::vector<Image> SavingManager::loadProject(QString filePath) {
-    if (!filePath.endsWith(".json")) throw std::invalid_argument("File is not .json");
+    if (!filePath.endsWith(".json"))
+        throw std::invalid_argument("File is not .json");
     QFile file(filePath);
     if (!file.open(QFile::ReadOnly)) {
         throw std::runtime_error("Could not open file for reading");
     }
     QJsonDocument doc = QJsonDocument::fromJson(file.readAll());
-    if (doc.isEmpty()) throw std::runtime_error("Could not parse file (it might be empty or corrupted)");
+    if (doc.isEmpty())
+        throw std::runtime_error(
+            "Could not parse file (it might be empty or corrupted)");
 
     QJsonObject json = doc.object();
     if (!json.contains("images")) throw std::invalid_argument("Invalid JSON");

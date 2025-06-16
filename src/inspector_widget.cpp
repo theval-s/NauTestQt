@@ -196,7 +196,7 @@ void InspectorWidget::onTransformPropertyChanged() {
     emit transformModified(transform);
 }
 void InspectorWidget::onDisplayOptionsChanged() {
-    DisplayOptions new_opts;
+    EditorSettings new_opts;
     new_opts.showPath = _showPath->isChecked();
     new_opts.showResolution = _showResolution->isChecked();
     new_opts.zoomValue = _zoom->value();

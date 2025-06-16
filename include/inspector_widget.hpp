@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "display_options.hpp"
+#include "editor_settings.hpp"
 #include "image.hpp"
 
 #include <QCheckBox>
@@ -54,7 +54,7 @@ class InspectorWidget : public QWidget {
     void opacityModified(qreal opacity);
     void itemVisibleModified(bool visible);
     void zValueModified(double zValue);
-    void displayOptionsModified(const DisplayOptions options);
+    void displayOptionsModified(const EditorSettings options);
 
   private slots:
     void onTransformPropertyChanged();

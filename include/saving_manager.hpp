@@ -3,20 +3,23 @@
 //
 
 #pragma once
+#include "editor_settings.hpp"
 #include "image.hpp"
 
-#include <QSettings>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
+#include <QSettings>
 
 namespace App {
 
 class SavingManager {
-    // QSettings
-public:
+  public:
     static void saveProject(const std::vector<Image> &images, QString filePath);
     static std::vector<Image> loadProject(QString filePath);
+
+    //saveEditorSettings/loadEditorSettings not implemented,
+    //(see ../include/editor_settings.hpp)
 };
 //Json example serialization:
 /*

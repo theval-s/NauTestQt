@@ -9,8 +9,8 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QStatusBar>
-#include <QVBoxLayout>
 #include <QToolBar>
+#include <QVBoxLayout>
 #include <main_window.hpp>
 
 namespace App {
@@ -46,8 +46,10 @@ void MainWindow::setupToolBar() {
     zoomInAction->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::ZoomIn));
     zoomOutAction->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::ZoomOut));
     if (_viewport) {
-        connect(zoomInAction, &QAction::triggered, _viewport, &ViewportWidget::zoomIn);
-        connect(zoomOutAction, &QAction::triggered, _viewport, &ViewportWidget::zoomOut);
+        connect(zoomInAction, &QAction::triggered, _viewport,
+                &ViewportWidget::zoomIn);
+        connect(zoomOutAction, &QAction::triggered, _viewport,
+                &ViewportWidget::zoomOut);
     }
     toolbar->addAction(zoomInAction);
     toolbar->addAction(zoomOutAction);
@@ -87,7 +89,9 @@ void MainWindow::openFile() {
             if (file.endsWith(".json")) {
                 std::vector<Image> images = SavingManager::loadProject(file);
                 if (images.size() > 0) _viewport->setImage(images[0]);
-                if (images.size() > 1) for (size_t i = 1; i < images.size(); i++) _viewport->addImage(images[i]);
+                if (images.size() > 1)
+                    for (size_t i = 1; i < images.size(); i++)
+                        _viewport->addImage(images[i]);
             } else {
                 Image img(file);
                 _viewport->addImage(img);
@@ -99,14 +103,14 @@ void MainWindow::openFile() {
 }
 void MainWindow::saveFile() {
     if (_viewport) try {
-        QString file = QFileDialog::getSaveFileName(this,"Save to...", QDir::homePath(),
-        "JSON File (*.json)");
-        qDebug() << "Saving to..." << file;
-        if (!file.endsWith(".json")) file+=".json";
-        SavingManager::saveProject(_viewport->getImages(), file);
-    } catch (const std::exception &e) {
-        QMessageBox::critical(this, "Error!", e.what());
-    }
+            QString file = QFileDialog::getSaveFileName(
+                this, "Save to...", QDir::homePath(), "JSON File (*.json)");
+            qDebug() << "Saving to..." << file;
+            if (!file.endsWith(".json")) file += ".json";
+            SavingManager::saveProject(_viewport->getImages(), file);
+        } catch (const std::exception &e) {
+            QMessageBox::critical(this, "Error!", e.what());
+        }
 }
 void MainWindow::connectSignals() {
     connect(this, &MainWindow::activeImageChanged, this,
@@ -191,7 +195,7 @@ void MainWindow::updateResolutionLabel() {
         QString::number(rect.width()) + "x" + QString::number(rect.height());
     _resolutionLabel->setText(res);
 }
-void MainWindow::updateDisplayOptions(const DisplayOptions &options) {
+void MainWindow::updateDisplayOptions(const EditorSettings &options) {
     if (options.showPath != _displayOptions.showPath) {
         if (options.showPath) {
             _pathLabel->setVisible(true);
@@ -229,8 +233,7 @@ void MainWindow::handleImageUpdate(const std::vector<Image> &images) {
         _resolutionLabel->setText("Resolution");
         _scaleLabel->setText("Scale");
         imageIndex = 0;
-    }
-    else if (images.size() == 1) {
+    } else if (images.size() == 1) {
         imageIndex = 0;
         emit activeImageChanged(images[imageIndex]);
     }
