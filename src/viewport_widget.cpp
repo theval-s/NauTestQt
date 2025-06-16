@@ -8,18 +8,9 @@ namespace App {
 
 void ViewportWidget::wheelEvent(QWheelEvent *event) {
     const float scaleValue =
-        event->angleDelta().y() > 0 ? 1 + ZOOM_VALUE : 1 - ZOOM_VALUE;
+        event->angleDelta().y() > 0 ? 1 + _mouseZoomValue : 1 - _mouseZoomValue;
     setScale(scaleValue);
     event->accept();
-}
-void ViewportWidget::updateBounds() {
-    qreal width = 0, height = 0;
-    for (const auto p : _items) {
-        width = qMax(p.second->sceneBoundingRect().width(), width);
-        height = qMax(p.second->sceneBoundingRect().height(), height);
-    }
-    _maxWidth = width;
-    _maxHeight = height;
 }
 
 ViewportWidget::ViewportWidget(QWidget *parent) : _scene(this) {
@@ -28,13 +19,13 @@ ViewportWidget::ViewportWidget(QWidget *parent) : _scene(this) {
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setDragMode(QGraphicsView::ScrollHandDrag);
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    setViewportUpdateMode(FullViewportUpdate);
     _scene.setBackgroundBrush(QBrush(Qt::gray));
 }
 
 void ViewportWidget::setImage(const Image &image) {
     _scene.clear();
     _items.clear();
-    _maxWidth = 0, _maxHeight = 0;
     addImage(image);
 }
 void ViewportWidget::addImage(const Image &image) {
@@ -46,14 +37,15 @@ void ViewportWidget::addImage(const Image &image) {
     _items.emplace_back(image, itemPixmap);
     applyParametersToPixmapItem(image, _items.size() - 1);
     updateSceneRect();
-    centerOn(_maxWidth / 2, _maxHeight / 2);
+    centerOn(_scene.itemsBoundingRect().center());
 }
 void ViewportWidget::removeImage(const size_t imageIndex) {
     if (imageIndex >= _items.size()) {
         throw std::out_of_range("Image index out of range");
     }
+    _scene.removeItem(_items[imageIndex].second);
     _items.erase(_items.begin() + imageIndex);
-    updateBounds();
+    updateSceneRect();
 
     emit imagesChanged(this->getImages());
 }
@@ -76,6 +68,7 @@ void ViewportWidget::setTransform(size_t index, QTransform pixmapTransform) {
     if (index >= _items.size()) return;
     _items[index].second->setTransform(pixmapTransform);
     _items[index].first.transform = pixmapTransform;
+    updateSceneRect();
 }
 void ViewportWidget::setOpacity(size_t index, float opacity) {
     if (index >= _items.size()) return;
@@ -105,7 +98,7 @@ std::vector<Image> ViewportWidget::getImages() const {
 }
 void ViewportWidget::updateSceneRect() {
     const QRectF viewRect = mapToScene(viewport()->rect()).boundingRect();
-    QRectF pixmapRect(0, 0, _maxWidth, _maxHeight);
+    QRectF pixmapRect = _scene.itemsBoundingRect();
     qreal marginX = viewRect.width() * 0.5f;
     qreal marginY = viewRect.height() * 0.5f;
     pixmapRect = pixmapRect.adjusted(-marginX, -marginY, marginX, marginY);
@@ -122,13 +115,7 @@ void ViewportWidget::applyParametersToPixmapItem(const Image &img,
     //Border is not implemented as a part of this, as the better way
     //to do it is overriding paint of QGraphicsPixmapItem
 
-    //Updating the actual rectangle size,
-    //because rotation and scale might have changed it
-    const QRectF rect = _items[pixmap_ind].second->sceneBoundingRect();
-    _maxHeight = qMax(_maxHeight, rect.height());
-    _maxWidth = qMax(_maxWidth, rect.width());
-
     emit imagesChanged(this->getImages());
-    // qDebug() << maxHeight << " " << maxWidth;
+    updateSceneRect();
 }
 } // namespace App

@@ -21,11 +21,9 @@ class ViewportWidget : public QGraphicsView {
     float _currentScale = 1.0f;
     QGraphicsScene _scene;
     std::vector<std::pair<Image, QGraphicsPixmapItem *>> _items;
-    qreal _maxHeight = 0, _maxWidth = 0;
     float _mouseZoomValue = 0.1f;
 
     void wheelEvent(QWheelEvent *event) override;
-    void updateBounds();
 
   public:
     explicit ViewportWidget(QWidget *parent = nullptr);
@@ -33,7 +31,7 @@ class ViewportWidget : public QGraphicsView {
     void setImage(const Image &image);
     void addImage(const Image &image);
     QRect getImageRectSize() const {
-        return QRect(0, 0, _maxWidth, _maxHeight);
+        return _scene.itemsBoundingRect().toRect();
     }
     void removeImage(const size_t imageIndex);
     float getScale() const { return _currentScale; }
