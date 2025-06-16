@@ -21,7 +21,10 @@ add_executable(NauTest main.cpp
         src/hierarchy_widget.cpp
         include/hierarchy_widget.hpp
         src/inspector_widget.cpp
-        include/inspector_widget.hpp)
+        include/inspector_widget.hpp
+        src/saving_manager.cpp
+        include/saving_manager.hpp
+        src/image.cpp)
 
 target_include_directories(NauTest PUBLIC include)
 target_link_libraries(NauTest PUBLIC
