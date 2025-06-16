@@ -25,21 +25,17 @@ ViewportWidget::ViewportWidget(QWidget *parent) : _scene(this) {
 void ViewportWidget::setImage(const Image &image) {
     _scene.clear();
     _items.clear();
-    maxHeight = image.getImage().height(), maxWidth = image.getImage().width();
-    _items.emplace_back(image,
-                        _scene.addPixmap(QPixmap::fromImage(image.getImage())));
-    updateSceneRect();
-    centerOn(maxWidth / 2, maxHeight / 2);
+    maxWidth = 0, maxHeight = 0;
+    addImage(image);
 }
 void ViewportWidget::addImage(const Image &image) {
     QGraphicsPixmapItem *itemPixmap =
         _scene.addPixmap(QPixmap::fromImage(image.getImage()));
-    maxHeight = qMax(itemPixmap->boundingRect().height(), maxHeight);
-    maxWidth = qMax(itemPixmap->boundingRect().width(), maxWidth);
-
+    itemPixmap->setTransformOriginPoint(itemPixmap->boundingRect().center());
+    //place for any other options to itemPixmap
 
     _items.emplace_back(image, itemPixmap);
-
+    applyParametersToPixmapItem(image,_items.size()-1);
     updateSceneRect();
     centerOn(maxWidth / 2, maxHeight / 2);
 }
@@ -66,5 +62,27 @@ void ViewportWidget::updateSceneRect() {
     qreal marginY = viewRect.height() *0.5f;
     pixmapRect = pixmapRect.adjusted(-marginX, -marginY, marginX, marginY);
     _scene.setSceneRect(pixmapRect);
+}
+
+void ViewportWidget::applyParametersToPixmapItem(const Image &img,
+                                                 const size_t pixmap_ind) {
+    // _items[pixmap_ind].second->setTransform(img.transform);
+    _items[pixmap_ind].second->setRotation(img.rotation);
+    _items[pixmap_ind].second->setOpacity(img.opacity);
+    _items[pixmap_ind].second->setVisible(img.isVisible);
+
+    //TODO: Implement horizontal and vertical flip
+
+    //Border is not implemented as a part of this, as the better way
+    //to do it is overriding paint of QGraphicsPixmapItem
+
+    //Updating the actual rectangle size,
+    //because rotation and scale might have changed it
+
+    // _items[pixmap_ind].second->r
+    QRectF rect = _items[pixmap_ind].second->sceneBoundingRect();
+    maxHeight = qMax(maxHeight, rect.height());
+    maxWidth = qMax(maxWidth, rect.width());
+    qDebug() << "height: " << maxHeight << " width: " << maxWidth;
 }
 } // namespace App

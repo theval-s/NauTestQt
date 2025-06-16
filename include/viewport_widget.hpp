@@ -34,6 +34,7 @@ class ViewportWidget : public QGraphicsView {
     void setScale(float scale);
     [[nodiscard]] std::vector<Image> getImages() const;
     void updateSceneRect();
+    void applyParametersToPixmapItem(const Image& img, size_t pixmap_ind);
 };
 
 } // namespace App
