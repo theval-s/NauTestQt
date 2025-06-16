@@ -30,7 +30,7 @@ class InspectorWidget : public QWidget {
     QCheckBox *_itemVisible = nullptr;
     QDoubleSpinBox *_zValue = nullptr;
 
-    //Display Options value widgets
+    //Editor Options value widgets
     QCheckBox *_showPath = nullptr, *_showResolution = nullptr;
     QDoubleSpinBox *_zoom = nullptr;
 

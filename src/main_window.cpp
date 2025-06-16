@@ -230,9 +230,9 @@ void MainWindow::handleImageUpdate(const std::vector<Image> &images) {
         _scaleLabel->setText("Scale");
         imageIndex = 0;
     }
-    // else {
-    //     imageIndex = images.size() - 1;
-    //     emit activeImageChanged(images[imageIndex]);
-    // }
+    else if (images.size() == 1) {
+        imageIndex = 0;
+        emit activeImageChanged(images[imageIndex]);
+    }
 }
 } // namespace App

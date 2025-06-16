@@ -38,7 +38,7 @@ void InspectorWidget::createTransformGroup() {
     position_layout->addWidget(new QLabel("Position", transform_widget));
 
     _posX = new QDoubleSpinBox(transform_widget);
-    _posX->setSingleStep(0.1f);
+    _posX->setSingleStep(1.f);
     _posX->setValue(0);
     connect(_posX, &QDoubleSpinBox::valueChanged, this,
             &InspectorWidget::onTransformPropertyChanged);
@@ -58,7 +58,7 @@ void InspectorWidget::createTransformGroup() {
     scale_layout->addWidget(new QLabel("Scale", transform_widget));
 
     _scaleX = new QDoubleSpinBox(transform_widget);
-    _scaleX->setSingleStep(0.5f);
+    _scaleX->setSingleStep(0.2f);
     _scaleX->setValue(1.0f);
     _scaleX->setMinimum(0.0f);
     connect(_scaleX, &QDoubleSpinBox::valueChanged, this,
@@ -81,6 +81,9 @@ void InspectorWidget::createTransformGroup() {
 
     _rotation = new QDoubleSpinBox(transform_widget);
     _rotation->setSingleStep(0.5f);
+    _rotation->setValue(0.0f);
+    _rotation->setMinimum(-360.f);
+    _rotation->setMaximum(360.f);
     connect(_rotation, &QDoubleSpinBox::valueChanged, this,
             &InspectorWidget::onTransformPropertyChanged);
     rotation_layout->addWidget(_rotation);
@@ -150,7 +153,7 @@ void InspectorWidget::createDisplayGroup() {
     QWidget *display_widget = new QWidget(this);
     QVBoxLayout *display_layout = new QVBoxLayout(display_widget);
     display_layout->setSpacing(10);
-    display_layout->addWidget(new QLabel("Display Settings", display_widget));
+    display_layout->addWidget(new QLabel("Editor Settings", display_widget));
     _contentLayout->addWidget(display_widget);
 
     //CheckBoxes
@@ -210,6 +213,7 @@ void InspectorWidget::loadImage(const Image &image) {
 
     double rot_radians = std::atan2(tf.m21(), tf.m11());
     _rotation->setValue(roundToStep(rot_radians * (180.0 / M_PI), 0.5f));
+    _opacity->setValue(image.opacity*100.f);
     _zValue->setValue(image.zValue);
 }
 
