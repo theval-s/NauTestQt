@@ -17,7 +17,11 @@ add_executable(NauTest main.cpp
         src/viewport_widget.cpp
         include/viewport_widget.hpp
         include/main_window.hpp
-        src/main_window.cpp)
+        src/main_window.cpp
+        src/hierarchy_widget.cpp
+        include/hierarchy_widget.hpp
+        src/inspector_widget.cpp
+        include/inspector_widget.hpp)
 
 target_include_directories(NauTest PUBLIC include)
 target_link_libraries(NauTest PUBLIC
