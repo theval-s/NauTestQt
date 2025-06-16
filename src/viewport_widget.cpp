@@ -73,16 +73,24 @@ void ViewportWidget::zoomOut(float scale) {
     setScale(scale);
 }
 void ViewportWidget::setTransform(size_t index, QTransform pixmapTransform) {
+    if (index >= _items.size()) return;
     _items[index].second->setTransform(pixmapTransform);
     _items[index].first.transform = pixmapTransform;
 }
 void ViewportWidget::setOpacity(size_t index, float opacity) {
+    if (index >= _items.size()) return;
     _items[index].second->setOpacity(opacity);
     _items[index].first.opacity = opacity;
 }
 void ViewportWidget::setItemVisible(size_t index, bool visible) {
+    if (index >= _items.size()) return;
     _items[index].second->setVisible(visible);
     _items[index].first.isVisible = visible;
+}
+void ViewportWidget::setItemZValue(size_t index, float zValue) {
+    if (index >= _items.size()) return;
+    _items[index].second->setZValue(zValue);
+    _items[index].first.zValue = zValue;
 }
 void ViewportWidget::setMouseZoom(const float zoom) {
     _mouseZoomValue = zoom;
@@ -109,12 +117,13 @@ void ViewportWidget::applyParametersToPixmapItem(const Image &img,
     _items[pixmap_ind].second->setTransform(img.transform);
     _items[pixmap_ind].second->setOpacity(img.opacity);
     _items[pixmap_ind].second->setVisible(img.isVisible);
+    _items[pixmap_ind].second->setZValue(img.zValue);
+
     //Border is not implemented as a part of this, as the better way
     //to do it is overriding paint of QGraphicsPixmapItem
 
     //Updating the actual rectangle size,
     //because rotation and scale might have changed it
-
     const QRectF rect = _items[pixmap_ind].second->sceneBoundingRect();
     _maxHeight = qMax(_maxHeight, rect.height());
     _maxWidth = qMax(_maxWidth, rect.width());

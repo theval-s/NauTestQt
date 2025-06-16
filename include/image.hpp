@@ -20,8 +20,9 @@ class Image {
     //Image parameters
     QTransform transform;
     float opacity = 1;
-    bool showBorder = false;
-    QColor borderColor = Qt::black;
+    float zValue = 0;
+    // bool showBorder = false;
+    // QColor borderColor = Qt::black;
     bool isVisible = true;
 
     Image(const QString &path)

@@ -51,6 +51,7 @@ class ViewportWidget : public QGraphicsView {
     void setTransform(size_t index=0, QTransform pixmapTransform = QTransform());
     void setOpacity(size_t index=0, float opacity = 1.0f);
     void setItemVisible(size_t index=0, bool visible = 1);
+    void setItemZValue(size_t index=0, float zValue = 0);
     void setMouseZoom(float zoom);
 
 };

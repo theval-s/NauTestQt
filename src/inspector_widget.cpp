@@ -129,6 +129,19 @@ void InspectorWidget::createAppearanceGroup() {
         emit opacityModified(new_opacity);
     });
     opacity_layout->addWidget(_opacity);
+
+    //Z-value (layer)
+    QHBoxLayout *z_value_layout = new QHBoxLayout();
+    z_value_layout->setSpacing(10);
+    z_value_layout->addWidget(new QLabel("Z value (layer)", appearance_widget));
+    appearance_layout->addLayout(z_value_layout);
+
+    _zValue = new QDoubleSpinBox(appearance_widget);
+    _zValue->setSingleStep(1.f);
+    _zValue->setValue(0);
+    connect(_zValue, &QDoubleSpinBox::valueChanged, this, &InspectorWidget::zValueModified);
+    appearance_layout->addWidget(_zValue);
+
 }
 void InspectorWidget::createDisplayGroup() {
     QWidget *display_widget = new QWidget(this);

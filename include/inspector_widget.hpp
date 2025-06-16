@@ -29,6 +29,7 @@ Q_OBJECT
     //Appearance value widgets
     QSlider* _opacity = nullptr;
     QCheckBox* _itemVisible = nullptr;
+    QDoubleSpinBox* _zValue = nullptr;
 
     //Display Options value widgets
     QCheckBox *_showPath = nullptr, *_showResolution = nullptr;
@@ -53,6 +54,7 @@ public:
     void transformModified(const QTransform &transform);
     void opacityModified(qreal opacity);
     void itemVisibleModified(bool visible);
+    void zValueModified(double zValue);
     void displayOptionsModified(const DisplayOptions options);
 
     private slots:
