@@ -20,6 +20,9 @@ class MainWindow : public QMainWindow {
     InspectorWidget *_inspector = nullptr;
     HierarchyWidget *_hierarchy = nullptr;
 
+    void setupStatusBar();
+    void menuBarSetup();
+    void setupToolBar();
     void setupUi();
     void connectSignals();
 

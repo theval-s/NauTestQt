@@ -10,10 +10,49 @@
 #include <QMessageBox>
 #include <QStatusBar>
 #include <QVBoxLayout>
+#include <QToolBar>
 #include <main_window.hpp>
 
 namespace App {
 
+void MainWindow::setupStatusBar() {
+    //status_bar initialisation
+    QStatusBar *status_bar = new QStatusBar(this);
+    _pathLabel = new QLabel(this);
+    _pathLabel->setText("Path");
+    _resolutionLabel = new QLabel(this);
+    _resolutionLabel->setText("Resolution");
+    _scaleLabel = new QLabel(this);
+    _scaleLabel->setText("100%");
+    status_bar->addWidget(_pathLabel);
+    status_bar->addWidget(_resolutionLabel);
+    status_bar->addWidget(_scaleLabel);
+    setStatusBar(status_bar);
+}
+void MainWindow::menuBarSetup() {
+    //menu initialisation
+    QMenuBar *menu = new QMenuBar(this);
+    QMenu *file_menu = menu->addMenu("File");
+    if (_openAction) file_menu->QWidget::addAction(_openAction);
+    if (_saveAction) file_menu->QWidget::addAction(_saveAction);
+    setMenuBar(menu);
+}
+void MainWindow::setupToolBar() {
+    QToolBar *toolbar = addToolBar("Main Toolbar");
+    if (_openAction) toolbar->QWidget::addAction(_openAction);
+    if (_openAction) toolbar->QWidget::addAction(_saveAction);
+    QAction *zoomInAction = new QAction("Zoom In", toolbar);
+    QAction *zoomOutAction = new QAction("Zoom Out", toolbar);
+    zoomInAction->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::ZoomIn));
+    zoomOutAction->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::ZoomOut));
+    if (_viewport) {
+        connect(zoomInAction, &QAction::triggered, _viewport, &ViewportWidget::zoomIn);
+        connect(zoomOutAction, &QAction::triggered, _viewport, &ViewportWidget::zoomOut);
+    }
+    toolbar->addAction(zoomInAction);
+    toolbar->addAction(zoomOutAction);
+    toolbar->addSeparator();
+}
 void MainWindow::setupUi() {
     QWidget *centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
@@ -30,27 +69,14 @@ void MainWindow::setupUi() {
     }
     if (_viewport) main_layout->addWidget(_viewport, 2);
 
-    //menu initialisation
-    QMenuBar *menu = new QMenuBar(this);
-    QMenu *file_menu = menu->addMenu("File");
     _openAction = new QAction("Open", this);
-    file_menu->addAction(_openAction);
     _saveAction = new QAction("Save", this);
-    file_menu->addAction(_saveAction);
-    setMenuBar(menu);
+    _openAction->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::DocumentNew));
+    _saveAction->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::DocumentSave));
 
-    //status_bar initialisation
-    QStatusBar *status_bar = new QStatusBar(this);
-    _pathLabel = new QLabel(this);
-    _pathLabel->setText("Path");
-    _resolutionLabel = new QLabel(this);
-    _resolutionLabel->setText("Resolution");
-    _scaleLabel = new QLabel(this);
-    _scaleLabel->setText("100%");
-    status_bar->addWidget(_pathLabel);
-    status_bar->addWidget(_resolutionLabel);
-    status_bar->addWidget(_scaleLabel);
-    setStatusBar(status_bar);
+    menuBarSetup();
+    setupStatusBar();
+    setupToolBar();
 }
 void MainWindow::openFile() {
     QString file = QFileDialog::getOpenFileName(

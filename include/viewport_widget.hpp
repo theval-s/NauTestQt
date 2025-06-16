@@ -46,8 +46,8 @@ class ViewportWidget : public QGraphicsView {
     void scaleChanged(float newScale);
   public slots:
     void setScale(float scale);
-    void zoomIn(float scale = 1 + 0.1f);
-    void zoomOut(float scale = 1 - 0.1f);
+    void zoomIn();
+    void zoomOut();
     void setTransform(size_t index = 0,
                       QTransform pixmapTransform = QTransform());
     void setOpacity(size_t index = 0, float opacity = 1.0f);

@@ -66,11 +66,11 @@ void ViewportWidget::setScale(float scaleValue) {
     updateSceneRect();
     emit scaleChanged(_currentScale);
 }
-void ViewportWidget::zoomIn(float scale) {
-    setScale(scale);
+void ViewportWidget::zoomIn() {
+    setScale(1+_mouseZoomValue);
 }
-void ViewportWidget::zoomOut(float scale) {
-    setScale(scale);
+void ViewportWidget::zoomOut() {
+    setScale(1-_mouseZoomValue);
 }
 void ViewportWidget::setTransform(size_t index, QTransform pixmapTransform) {
     if (index >= _items.size()) return;
