@@ -9,7 +9,6 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt6 COMPONENTS
         Core
-        Gui
         Widgets
         REQUIRED)
 
@@ -28,7 +27,6 @@ add_executable(NauTest main.cpp
 target_include_directories(NauTest PUBLIC include)
 target_link_libraries(NauTest PUBLIC
         Qt::Core
-        Qt::Gui
         Qt::Widgets
 )
 qt_finalize_executable(NauTest)
