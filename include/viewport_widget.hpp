@@ -13,7 +13,7 @@ namespace App {
 // TODO: Add ImagesChanged signal and slot
 constexpr float ZOOM_VALUE = 0.1f; // get from settings later
 constexpr float ZOOM_MIN = 0.1f;
-constexpr float ZOOM_MAX = 100.0f;
+constexpr float ZOOM_MAX = 10.0f;
 
 class ViewportWidget : public QGraphicsView {
     Q_OBJECT
@@ -31,6 +31,9 @@ class ViewportWidget : public QGraphicsView {
     // ~ViewportWidget();
     void setImage(const Image &image);
     void addImage(const Image &image);
+    QRect getImageRectSize() const {
+        return QRect(0, 0, maxHeight(), maxWidth());
+    }
     void removeImage(const size_t imageIndex);
     float getScale() const { return _currentScale; }
     [[nodiscard]] std::vector<Image> getImages() const;
