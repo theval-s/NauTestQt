@@ -9,6 +9,7 @@
 #include <QListWidget>
 namespace App {
 
+/// Widget that displays ordered list of all Images on current Viewport vector
 class HierarchyWidget : public QListWidget {
     Q_OBJECT
   public:
@@ -20,6 +21,8 @@ class HierarchyWidget : public QListWidget {
     }
 
   public slots:
+    ///Clears existing list and builds a new one
+    ///@param images vector of Images to display in hierarchy
     void updateList(const std::vector<Image> &images);
 };
 

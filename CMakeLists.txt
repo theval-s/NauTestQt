@@ -23,7 +23,6 @@ add_executable(NauTest main.cpp
         src/inspector_widget.cpp
         include/inspector_widget.hpp
         src/saving_manager.cpp
-        include/saving_manager.hpp
         src/image.cpp)
 
 target_include_directories(NauTest PUBLIC include)

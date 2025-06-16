@@ -13,6 +13,7 @@ QTransform Image::transformFromJson(const QJsonObject &json) {
         !json.contains("m33")) {
         throw std::invalid_argument("Image::transformFromJson: Invalid JSON");
     }
+    //If there are some issues with values but keys are there I'm assuming defaults
     return QTransform(json["m11"].toDouble(1.0), json["m12"].toDouble(0.0),
                       json["m13"].toDouble(0.0), json["m21"].toDouble(0.0),
                       json["m22"].toDouble(1.0), json["m23"].toDouble(0.0),

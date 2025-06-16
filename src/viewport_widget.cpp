@@ -7,6 +7,8 @@
 namespace App {
 
 void ViewportWidget::wheelEvent(QWheelEvent *event) {
+    //only using to zoom in/out so I think there's no need to bother
+    //with angleDelta().x()
     const float scaleValue =
         event->angleDelta().y() > 0 ? 1 + _mouseZoomValue : 1 - _mouseZoomValue;
     setScale(scaleValue);
@@ -14,6 +16,7 @@ void ViewportWidget::wheelEvent(QWheelEvent *event) {
 }
 
 ViewportWidget::ViewportWidget(QWidget *parent) : _scene(this) {
+    //sets scene and needed settings
     setScene(&_scene);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -31,13 +34,12 @@ void ViewportWidget::setImage(const Image &image) {
 void ViewportWidget::addImage(const Image &image) {
     QGraphicsPixmapItem *itemPixmap =
         _scene.addPixmap(QPixmap::fromImage(image.getImage()));
-    itemPixmap->setTransformOriginPoint(itemPixmap->boundingRect().center());
-    //place for any other options to itemPixmap
-
+    //place for any options to itemPixmap
     _items.emplace_back(image, itemPixmap);
     applyParametersToPixmapItem(image, _items.size() - 1);
     updateSceneRect();
     centerOn(_scene.itemsBoundingRect().center());
+    emit imagesChanged(this->getImages());
 }
 void ViewportWidget::removeImage(const size_t imageIndex) {
     if (imageIndex >= _items.size()) {
@@ -52,7 +54,12 @@ void ViewportWidget::removeImage(const size_t imageIndex) {
 
 void ViewportWidget::setScale(float scaleValue) {
     float newScale = _currentScale * scaleValue;
-    if (newScale < ZOOM_MIN || newScale > ZOOM_MAX) return;
+    if (newScale < ZOOM_MIN) return;
+    if (newScale > ZOOM_MAX) {
+        //clamping to ZOOM_MAX
+        if (std::abs(_currentScale-ZOOM_MAX)<1e-9) return;
+        else newScale = ZOOM_MAX;
+    }
     _currentScale = newScale;
     scale(scaleValue, scaleValue);
     updateSceneRect();
@@ -70,6 +77,8 @@ void ViewportWidget::setTransform(size_t index, QTransform pixmapTransform) {
     _items[index].first.transform = pixmapTransform;
     updateSceneRect();
 }
+
+//Rect is not changing in those, so no need to update it
 void ViewportWidget::setOpacity(size_t index, float opacity) {
     if (index >= _items.size()) return;
     _items[index].second->setOpacity(opacity);
@@ -89,6 +98,8 @@ void ViewportWidget::setMouseZoom(const float zoom) {
     _mouseZoomValue = zoom;
 }
 std::vector<Image> ViewportWidget::getImages() const {
+    //there might be some better way with std::ranges
+    //but I don't know them at all
     std::vector<Image> result;
     result.reserve(_items.size());
     for (const auto &p : _items) {
@@ -98,6 +109,8 @@ std::vector<Image> ViewportWidget::getImages() const {
 }
 void ViewportWidget::updateSceneRect() {
     const QRectF viewRect = mapToScene(viewport()->rect()).boundingRect();
+    //getting the bounds of the whole scene,
+    //and applying margins to allow panning a bit past the screen
     QRectF pixmapRect = _scene.itemsBoundingRect();
     qreal marginX = viewRect.width() * 0.5f;
     qreal marginY = viewRect.height() * 0.5f;
@@ -115,7 +128,6 @@ void ViewportWidget::applyParametersToPixmapItem(const Image &img,
     //Border is not implemented as a part of this, as the better way
     //to do it is overriding paint of QGraphicsPixmapItem
 
-    emit imagesChanged(this->getImages());
     updateSceneRect();
 }
 } // namespace App

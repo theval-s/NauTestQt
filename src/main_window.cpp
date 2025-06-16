@@ -38,9 +38,13 @@ void MainWindow::menuBarSetup() {
     setMenuBar(menu);
 }
 void MainWindow::setupToolBar() {
+    //toolbar init
     QToolBar *toolbar = addToolBar("Main Toolbar");
     if (_openAction) toolbar->QWidget::addAction(_openAction);
     if (_openAction) toolbar->QWidget::addAction(_saveAction);
+
+    //those actions are only used in toolbar (as of now), so they are owned by it
+    //and have limited scope
     QAction *zoomInAction = new QAction("Zoom In", toolbar);
     QAction *zoomOutAction = new QAction("Zoom Out", toolbar);
     QAction *resetAction = new QAction("Reset", toolbar);
@@ -55,7 +59,8 @@ void MainWindow::setupToolBar() {
                 &ViewportWidget::zoomIn);
         connect(zoomOutAction, &QAction::triggered, _viewport,
                 &ViewportWidget::zoomOut);
-        connect(resetAction, &QAction::triggered, this, &MainWindow::resetTransform);
+        connect(resetAction, &QAction::triggered, this,
+                &MainWindow::resetTransform);
     }
 
     toolbar->addAction(zoomInAction);
@@ -93,6 +98,8 @@ void MainWindow::openFile() {
         this, "Open...", QDir::homePath(),
         "Supported files (*.png *.jpg *jpeg *webm *.bmp *.json)");
     if (!file.isEmpty() && _viewport) {
+        //Those constructors and functions can throw, so we catch
+        //and use QMessageBox to show
         try {
             if (file.endsWith(".json")) {
                 std::vector<Image> images = SavingManager::loadProject(file);
@@ -147,7 +154,7 @@ void MainWindow::connectSignals() {
                 &InspectorWidget::loadImage);
 
         //from inspector
-        connect(_inspector, &InspectorWidget::displayOptionsModified, this,
+        connect(_inspector, &InspectorWidget::editorSettingsModified, this,
                 &MainWindow::updateEditorSettings);
         if (_viewport) {
             connect(_inspector, &InspectorWidget::transformModified, _viewport,
@@ -204,6 +211,7 @@ void MainWindow::updateResolutionLabel() {
     _resolutionLabel->setText(res);
 }
 void MainWindow::updateEditorSettings(const EditorSettings &options) {
+    //connecting and disconnecting stuff accordingly
     if (options.showPath != _displayOptions.showPath) {
         if (options.showPath) {
             _pathLabel->setVisible(true);

@@ -6,6 +6,8 @@
 #include <QJsonObject>
 
 namespace App {
+
+/// @brief Settings related to editor
 struct EditorSettings {
     bool showPath = true;
     bool showResolution = true;

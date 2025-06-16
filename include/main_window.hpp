@@ -20,13 +20,14 @@ class MainWindow : public QMainWindow {
     InspectorWidget *_inspector = nullptr;
     HierarchyWidget *_hierarchy = nullptr;
 
+    //Setting up UI and signals
     void setupStatusBar();
     void menuBarSetup();
     void setupToolBar();
     void setupUi();
     void connectSignals();
 
-    //menu_bar actions
+    //menu_bar and toolbar actions
     QAction *_openAction;
     QAction *_saveAction;
     //status_bar widgets:
@@ -38,7 +39,9 @@ class MainWindow : public QMainWindow {
     size_t _imageIndex = 0;
 
   public:
+    /// @brief Constructs the window and all widgets
     explicit MainWindow(QWidget *parent = nullptr);
+    /// @brief Constructs the window with specified size and all widgets in it
     MainWindow(int width, int height, QWidget *parent = nullptr);
 
   public slots:
@@ -46,7 +49,9 @@ class MainWindow : public QMainWindow {
     void updateScaleLabel(float scale);
     void updateResolutionLabel();
     void updateEditorSettings(const EditorSettings &options);
+    /// @brief Acts on imagesChanged() signal from _viewport
     void handleImageUpdate(const std::vector<Image> &images);
+    /// @brief Resets transform of currently selected Image
     void resetTransform();
     void openFile();
     void saveFile();

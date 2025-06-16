@@ -11,12 +11,14 @@
 namespace App {
 
 void InspectorWidget::setupUi() {
+    //setting up main and content layout
     QVBoxLayout *main_layout = new QVBoxLayout(this);
     QWidget *content_widget = new QWidget(this);
     _contentLayout = new QVBoxLayout(content_widget);
     _contentLayout->setSpacing(2);
     _contentLayout->setContentsMargins(11, 11, 11, 11);
 
+    //setting up scroll area (to make it scrollable vertically if needed
     QScrollArea *scroll_area = new QScrollArea();
     scroll_area->setWidgetResizable(true);
     scroll_area->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -26,6 +28,7 @@ void InspectorWidget::setupUi() {
     main_layout->addWidget(scroll_area);
 }
 void InspectorWidget::createTransformGroup() {
+    //TransformGroup widget
     QWidget *transform_widget = new QWidget(this);
     QVBoxLayout *transform_layout = new QVBoxLayout(transform_widget);
     transform_layout->addWidget(new QLabel("Transform", transform_widget));
@@ -45,7 +48,7 @@ void InspectorWidget::createTransformGroup() {
     _posY = new QDoubleSpinBox(transform_widget);
     connect(_posY, &QDoubleSpinBox::valueChanged, this,
             &InspectorWidget::onTransformPropertyChanged);
-    _posY->setSingleStep(0.1f);
+    _posY->setSingleStep(1.f);
     _posY->setValue(0);
 
     position_layout->addWidget(_posX);
@@ -104,8 +107,11 @@ void InspectorWidget::createTransformGroup() {
 
     flip_layout->addWidget(_flipX);
     flip_layout->addWidget(_flipY);
+
+    //All widgets are connected to onTransformPropertyChanged()
 }
 void InspectorWidget::createAppearanceGroup() {
+    //Main Appearance group widget
     QWidget *appearance_widget = new QWidget(this);
     QVBoxLayout *appearance_layout = new QVBoxLayout(appearance_widget);
     appearance_layout->setSpacing(2);
@@ -149,7 +155,8 @@ void InspectorWidget::createAppearanceGroup() {
             &InspectorWidget::zValueModified);
     appearance_layout->addWidget(_zValue);
 }
-void InspectorWidget::createDisplayGroup() {
+void InspectorWidget::createEditorGroup() {
+    //Main editor group widget
     QWidget *display_widget = new QWidget(this);
     QVBoxLayout *display_layout = new QVBoxLayout(display_widget);
     display_layout->setSpacing(10);
@@ -185,8 +192,16 @@ void InspectorWidget::createDisplayGroup() {
 float InspectorWidget::roundToStep(float val, float step) {
     return std::round(val / step) * step;
 }
+InspectorWidget::InspectorWidget(QWidget *parent) {
+    setParent(parent);
+    setupUi();
+    createTransformGroup();
+    createAppearanceGroup();
+    createEditorGroup();
+}
 void InspectorWidget::onTransformPropertyChanged() {
-    QTransform transform;
+    QTransform transform{};
+    //applying all values to default-init transform
     transform.translate(_posX->value(), _posY->value());
     transform.scale(_scaleX->value(), _scaleY->value());
     transform.rotate(_rotation->value());
@@ -200,7 +215,7 @@ void InspectorWidget::onDisplayOptionsChanged() {
     new_opts.showPath = _showPath->isChecked();
     new_opts.showResolution = _showResolution->isChecked();
     new_opts.zoomValue = _zoom->value();
-    emit displayOptionsModified(new_opts);
+    emit editorSettingsModified(new_opts);
 }
 void InspectorWidget::loadImage(const Image &image) {
 
@@ -208,6 +223,8 @@ void InspectorWidget::loadImage(const Image &image) {
     const QTransform tf = image.transform;
     _posX->setValue(tf.dx()); //not sure if I have to round this
     _posY->setValue(tf.dy());
+    //Transformation matrices might be a little magic
+    //(huge thanks to the Internet for formulas)
     _scaleX->setValue(roundToStep(std::hypot(tf.m11(), tf.m12()), 0.1f));
     _scaleY->setValue(roundToStep(std::hypot(tf.m21(), tf.m22()), 0.1f));
 
