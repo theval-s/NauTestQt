@@ -24,17 +24,28 @@ class ViewportWidget : public QGraphicsView {
     qreal maxHeight = 0, maxWidth = 0;
 
     void wheelEvent(QWheelEvent *event) override;
+    void updateBounds();
 
   public:
     explicit ViewportWidget(QWidget *parent = nullptr);
     // ~ViewportWidget();
     void setImage(const Image &image);
     void addImage(const Image &image);
+    void removeImage(const size_t imageIndex);
     float getScale() const { return _currentScale; }
-    void setScale(float scale);
     [[nodiscard]] std::vector<Image> getImages() const;
     void updateSceneRect();
-    void applyParametersToPixmapItem(const Image& img, size_t pixmap_ind);
-};
+    void applyParametersToPixmapItem(const Image &img, size_t pixmap_ind);
 
+  signals:
+    void imagesChanged();
+    void scaleChanged(float newScale);
+  public slots:
+    void setScale(float scale);
+    void zoomIn(float scale=1+ZOOM_VALUE);
+    void zoomOut(float scale=1-ZOOM_VALUE);
+    void setTransform(size_t index, QTransform pixmapTransform);
+    void setOpacity(size_t index, float opacity);
+    void setItemVisible(size_t index, bool visible);
+};
 } // namespace App

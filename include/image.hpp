@@ -19,7 +19,6 @@ class Image {
   public:
     //Image parameters
     QTransform transform;
-    float rotation = 0;
     float opacity = 1;
     bool showBorder = false;
     QColor borderColor = Qt::black;
