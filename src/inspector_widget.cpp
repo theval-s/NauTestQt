@@ -109,6 +109,12 @@ void InspectorWidget::createAppearanceGroup() {
     appearance_layout->addWidget(new QLabel("Appearance", appearance_widget));
     _contentLayout->addWidget(appearance_widget);
 
+    //Visibility
+    _itemVisible = new QCheckBox("Visible");
+    _itemVisible->setChecked(true);
+    appearance_layout->addWidget(_itemVisible);
+    connect(_itemVisible, &QCheckBox::toggled, this, &InspectorWidget::itemVisibleModified);
+
     //Opacity
     QHBoxLayout *opacity_layout = new QHBoxLayout();
     opacity_layout->setSpacing(2);
@@ -119,7 +125,7 @@ void InspectorWidget::createAppearanceGroup() {
     _opacity->setValue(100.0f);
     _opacity->setRange(0, 100);
     connect(_opacity, &QSlider::valueChanged, this, [this]() {
-        const qreal new_opacity = _opacity->value();
+        const qreal new_opacity = _opacity->value()/100.0f;
         emit opacityModified(new_opacity);
     });
     opacity_layout->addWidget(_opacity);
@@ -133,17 +139,15 @@ void InspectorWidget::createDisplayGroup() {
 
     //CheckBoxes
     _showPath = new QCheckBox("Show Path", display_widget);
+    _showPath->setChecked(true);
     connect(_showPath, &QCheckBox::checkStateChanged, this,
             &InspectorWidget::onDisplayOptionsChanged);
     display_layout->addWidget(_showPath);
     _showResolution = new QCheckBox("Show Resolution", display_widget);
+    _showResolution->setChecked(true);
     connect(_showResolution, &QCheckBox::checkStateChanged, this,
             &InspectorWidget::onDisplayOptionsChanged);
     display_layout->addWidget(_showResolution);
-    showMousePos = new QCheckBox("Show MousePos", display_widget);
-    connect(showMousePos, &QCheckBox::checkStateChanged, this,
-            &InspectorWidget::onDisplayOptionsChanged);
-    display_layout->addWidget(showMousePos);
 
     //Zoom spinbox
     QHBoxLayout *zoom_layout = new QHBoxLayout();
@@ -154,6 +158,7 @@ void InspectorWidget::createDisplayGroup() {
     _zoom = new QDoubleSpinBox(display_widget);
     _zoom->setSingleStep(0.05f);
     _zoom->setMinimum(0.001f);
+    _zoom->setValue(0.1f);
     connect(_zoom, &QDoubleSpinBox::valueChanged, this,
             &InspectorWidget::onDisplayOptionsChanged);
     zoom_layout->addWidget(_zoom);
@@ -175,7 +180,6 @@ void InspectorWidget::onDisplayOptionsChanged() {
     DisplayOptions new_opts;
     new_opts.showPath = _showPath->isChecked();
     new_opts.showResolution = _showResolution->isChecked();
-    new_opts.showMousePos = showMousePos->isChecked();
     new_opts.zoomValue = _zoom->value();
     emit displayOptionsModified(new_opts);
 }

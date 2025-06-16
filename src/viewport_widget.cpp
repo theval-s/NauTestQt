@@ -18,8 +18,8 @@ void ViewportWidget::updateBounds() {
         width = qMax(p.second->sceneBoundingRect().width(), width);
         height = qMax(p.second->sceneBoundingRect().height(), height);
     }
-    maxWidth = width;
-    maxHeight = height;
+    _maxWidth = width;
+    _maxHeight = height;
 }
 
 ViewportWidget::ViewportWidget(QWidget *parent) : _scene(this) {
@@ -34,7 +34,7 @@ ViewportWidget::ViewportWidget(QWidget *parent) : _scene(this) {
 void ViewportWidget::setImage(const Image &image) {
     _scene.clear();
     _items.clear();
-    maxWidth = 0, maxHeight = 0;
+    _maxWidth = 0, _maxHeight = 0;
     addImage(image);
 }
 void ViewportWidget::addImage(const Image &image) {
@@ -46,7 +46,7 @@ void ViewportWidget::addImage(const Image &image) {
     _items.emplace_back(image, itemPixmap);
     applyParametersToPixmapItem(image, _items.size() - 1);
     updateSceneRect();
-    centerOn(maxWidth / 2, maxHeight / 2);
+    centerOn(_maxWidth / 2, _maxHeight / 2);
 }
 void ViewportWidget::removeImage(const size_t imageIndex) {
     if (imageIndex >= _items.size()) {
@@ -84,6 +84,9 @@ void ViewportWidget::setItemVisible(size_t index, bool visible) {
     _items[index].second->setVisible(visible);
     _items[index].first.isVisible = visible;
 }
+void ViewportWidget::setMouseZoom(const float zoom) {
+    _mouseZoomValue = zoom;
+}
 std::vector<Image> ViewportWidget::getImages() const {
     std::vector<Image> result;
     result.reserve(_items.size());
@@ -94,7 +97,7 @@ std::vector<Image> ViewportWidget::getImages() const {
 }
 void ViewportWidget::updateSceneRect() {
     const QRectF viewRect = mapToScene(viewport()->rect()).boundingRect();
-    QRectF pixmapRect(0,0,maxWidth,maxHeight);
+    QRectF pixmapRect(0,0,_maxWidth,_maxHeight);
     qreal marginX = viewRect.width() *0.5f;
     qreal marginY = viewRect.height() *0.5f;
     pixmapRect = pixmapRect.adjusted(-marginX, -marginY, marginX, marginY);
@@ -113,8 +116,8 @@ void ViewportWidget::applyParametersToPixmapItem(const Image &img,
     //because rotation and scale might have changed it
 
     const QRectF rect = _items[pixmap_ind].second->sceneBoundingRect();
-    maxHeight = qMax(maxHeight, rect.height());
-    maxWidth = qMax(maxWidth, rect.width());
+    _maxHeight = qMax(_maxHeight, rect.height());
+    _maxWidth = qMax(_maxWidth, rect.width());
 
     emit imagesChanged(this->getImages());
     // qDebug() << maxHeight << " " << maxWidth;

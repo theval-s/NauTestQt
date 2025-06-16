@@ -21,7 +21,8 @@ class ViewportWidget : public QGraphicsView {
     float _currentScale = 1.0f;
     QGraphicsScene _scene;
     std::vector<std::pair<Image, QGraphicsPixmapItem *>> _items;
-    qreal maxHeight = 0, maxWidth = 0;
+    qreal _maxHeight = 0, _maxWidth = 0;
+    float _mouseZoomValue = 0.1f;
 
     void wheelEvent(QWheelEvent *event) override;
     void updateBounds();
@@ -32,7 +33,7 @@ class ViewportWidget : public QGraphicsView {
     void setImage(const Image &image);
     void addImage(const Image &image);
     QRect getImageRectSize() const {
-        return QRect(0, 0, maxWidth, maxHeight);
+        return QRect(0, 0, _maxWidth, _maxHeight);
     }
     void removeImage(const size_t imageIndex);
     float getScale() const { return _currentScale; }
@@ -45,10 +46,12 @@ class ViewportWidget : public QGraphicsView {
     void scaleChanged(float newScale);
   public slots:
     void setScale(float scale);
-    void zoomIn(float scale=1+ZOOM_VALUE);
-    void zoomOut(float scale=1-ZOOM_VALUE);
-    void setTransform(size_t index, QTransform pixmapTransform);
-    void setOpacity(size_t index, float opacity);
-    void setItemVisible(size_t index, bool visible);
+    void zoomIn(float scale=1+0.1f);
+    void zoomOut(float scale=1-0.1f);
+    void setTransform(size_t index=0, QTransform pixmapTransform = QTransform());
+    void setOpacity(size_t index=0, float opacity = 1.0f);
+    void setItemVisible(size_t index=0, bool visible = 1);
+    void setMouseZoom(float zoom);
+
 };
 } // namespace App

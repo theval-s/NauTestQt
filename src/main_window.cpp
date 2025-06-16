@@ -4,6 +4,7 @@
 
 #include <main_window.hpp>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QMenuBar>
 #include <QStatusBar>
 #include <QFileDialog>
@@ -14,8 +15,14 @@ void MainWindow::setupUi() {
     QWidget *centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
     QHBoxLayout *main_layout = new QHBoxLayout(centralWidget);
+    QVBoxLayout *side_layout = new QVBoxLayout();
+    main_layout->addLayout(side_layout);
 
+    if (_inspector) {
+        side_layout->addWidget(_inspector, 2);
+    }
     if (_viewport) main_layout->addWidget(_viewport, 2);
+
 
     //menu initialisation
     QMenuBar *menu = new QMenuBar(this);
@@ -38,44 +45,111 @@ void MainWindow::setupUi() {
     setStatusBar(status_bar);
 }
 void MainWindow::connectSignals() {
-
+        connect(this, &MainWindow::activeImageChanged, this, &MainWindow::updatePathLabel);
     if (_viewport) {
-        connect(_viewport, &ViewportWidget::scaleChanged, this, &MainWindow::updateScaleLabel);
-        connect(_viewport, &ViewportWidget::imagesChanged, this, &MainWindow::updatePathLabel);
-        connect(_viewport, &ViewportWidget::imagesChanged, this, &MainWindow::updateResolutionLabel);
-
+        //to viewport
+        connect(this, &MainWindow::zoomValueChanged, _viewport, &ViewportWidget::setMouseZoom);
         connect(_openAction, &QAction::triggered, [this]() {
-            QString file = QFileDialog::getOpenFileName(this, "Open...", QDir::homePath(), "Images (*.png *.jpg *jpeg *webm)");
-            if (!file.isEmpty()) {
-                Image img(file);
-                _viewport->addImage(img);
-            }
+                    QString file = QFileDialog::getOpenFileName(this, "Open...", QDir::homePath(), "Images (*.png *.jpg *jpeg *webm)");
+                    if (!file.isEmpty()) {
+                        Image img(file);
+                        _viewport->addImage(img);
+                    }
+                });
+
+        //from viewport
+        connect(_viewport, &ViewportWidget::imagesChanged, this, &MainWindow::handleImageUpdate);
+        connect(_viewport, &ViewportWidget::scaleChanged, this, &MainWindow::updateScaleLabel);
+        connect(_viewport, &ViewportWidget::imagesChanged, this, &MainWindow::updateResolutionLabel);
+    }
+    if (_inspector) {
+        //to inspector
+        connect(this, &MainWindow::activeImageChanged, _inspector, &InspectorWidget::loadImage);
+
+        //from inspector
+        connect(_inspector, &InspectorWidget::displayOptionsModified, this, &MainWindow::updateDisplayOptions);
+        if (_viewport) {
+            connect(_inspector, &InspectorWidget::transformModified, _viewport, [this](const QTransform &transform) {
+            _viewport->setTransform(imageIndex, transform);
         });
+            connect(_inspector, &InspectorWidget::itemVisibleModified, this, [this](bool visible) {
+            _viewport->setItemVisible(imageIndex, visible);
+        });
+            connect(_inspector, &InspectorWidget::opacityModified, this, [this](float opacity) {
+                _viewport->setOpacity(imageIndex, opacity);
+            });
+        }
     }
 
 }
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), _viewport(new ViewportWidget(this)) {
+    : QMainWindow(parent), _viewport(new ViewportWidget(this)),
+ _inspector(new InspectorWidget){
     setupUi();
     connectSignals();
 }
 MainWindow::MainWindow(int width, int height, QWidget *parent)
-    : QMainWindow(parent), _viewport(new ViewportWidget(this)) {
+    : QMainWindow(parent), _viewport(new ViewportWidget(this)),
+_inspector(new InspectorWidget){
     this->resize(width, height);
     setupUi();
     connectSignals();
 }
-void MainWindow::updatePathLabel() {
-    std::vector<Image> images = _viewport->getImages();
-    if (images.empty()) return;
-    _pathLabel->setText(images[0].getFileInfo().absoluteFilePath());
+void MainWindow::updatePathLabel(const Image& image) {
+    _pathLabel->setText(image.getFileInfo().absoluteFilePath());
 }
 void MainWindow::updateScaleLabel(float scale) {
     _scaleLabel->setText(QString::number(scale*100, 'f',0) + "%");
 }
 void MainWindow::updateResolutionLabel() {
     QRect rect = _viewport->getImageRectSize();
-    QString res = QString::number(rect.width())+ "x" + QString::number(rect.height());
+    QString res =
+        QString::number(rect.width()) + "x" + QString::number(rect.height());
     _resolutionLabel->setText(res);
+}
+void MainWindow::updateDisplayOptions(const DisplayOptions &options) {
+    if (options.showPath != _displayOptions.showPath) {
+        if (options.showPath) {
+            _pathLabel->setVisible(true);
+            if (_viewport)
+                connect(this, &MainWindow::activeImageChanged, this, &MainWindow::updatePathLabel);
+            //if(_hierarchy)
+        } else {
+            _pathLabel->setVisible(false);
+            if (_viewport)
+                disconnect(this, &MainWindow::activeImageChanged, this, &MainWindow::updatePathLabel);
+
+            //if(_hierarchy)
+        }
+    }
+    if (options.showResolution != _displayOptions.showResolution) {
+        if (options.showResolution) {
+            _resolutionLabel->setVisible(true);
+            if (_viewport)
+                connect(_viewport, &ViewportWidget::imagesChanged, this,
+                        &MainWindow::updateResolutionLabel);
+        } else {
+            _resolutionLabel->setVisible(false);
+            if (_viewport)
+                disconnect(_viewport, &ViewportWidget::imagesChanged, this,
+                           &MainWindow::updateResolutionLabel);
+        }
+    }
+    if (options.zoomValue != _displayOptions.zoomValue) {
+        emit zoomValueChanged(options.zoomValue);
+    }
+    _displayOptions = options;
+}
+void MainWindow::handleImageUpdate(const std::vector<Image> &images) {
+    if (images.empty()) {
+        _pathLabel->setText("Path");
+        _resolutionLabel->setText("Resolution");
+        _scaleLabel->setText("Scale");
+        imageIndex = 0;
+    }
+    else /*if(!_hierarchy)*/ {
+        imageIndex = images.size() - 1;
+        emit activeImageChanged(images[imageIndex]);
+    }
 }
 } // App

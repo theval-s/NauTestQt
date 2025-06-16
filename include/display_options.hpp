@@ -7,6 +7,5 @@
 struct DisplayOptions {
     bool showPath = true;
     bool showResolution = true;
-    bool showMousePos = false;
     double zoomValue = 0.1f;
 };
