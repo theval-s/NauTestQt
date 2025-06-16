@@ -207,6 +207,7 @@ void InspectorWidget::loadImage(const Image &image) {
 
     double rot_radians = std::atan2(tf.m21(), tf.m11());
     _rotation->setValue(roundToStep(rot_radians*(180.0 / M_PI), 0.5f));
+    _zValue->setValue(image.zValue);
 }
 
 } // namespace App
