@@ -14,8 +14,10 @@ find_package(Qt6 COMPONENTS
         REQUIRED)
 
 add_executable(NauTest main.cpp
-    src/viewport_widget.cpp
-    include/viewport_widget.hpp)
+        src/viewport_widget.cpp
+        include/viewport_widget.hpp
+        include/main_window.hpp
+        src/main_window.cpp)
 
 target_include_directories(NauTest PUBLIC include)
 target_link_libraries(NauTest PUBLIC
