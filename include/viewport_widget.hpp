@@ -32,7 +32,7 @@ class ViewportWidget : public QGraphicsView {
     void setImage(const Image &image);
     void addImage(const Image &image);
     QRect getImageRectSize() const {
-        return QRect(0, 0, maxHeight(), maxWidth());
+        return QRect(0, 0, maxWidth, maxHeight);
     }
     void removeImage(const size_t imageIndex);
     float getScale() const { return _currentScale; }
@@ -41,7 +41,7 @@ class ViewportWidget : public QGraphicsView {
     void applyParametersToPixmapItem(const Image &img, size_t pixmap_ind);
 
   signals:
-    void imagesChanged();
+    void imagesChanged(const std::vector<Image> &images);
     void scaleChanged(float newScale);
   public slots:
     void setScale(float scale);

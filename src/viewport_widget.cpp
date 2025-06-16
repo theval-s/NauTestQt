@@ -55,7 +55,7 @@ void ViewportWidget::removeImage(const size_t imageIndex) {
     _items.erase(_items.begin() + imageIndex);
     updateBounds();
 
-    emit imagesChanged();
+    emit imagesChanged(this->getImages());
 }
 
 void ViewportWidget::setScale(float scaleValue) {
@@ -116,7 +116,7 @@ void ViewportWidget::applyParametersToPixmapItem(const Image &img,
     maxHeight = qMax(maxHeight, rect.height());
     maxWidth = qMax(maxWidth, rect.width());
 
-    emit imagesChanged();
+    emit imagesChanged(this->getImages());
     // qDebug() << maxHeight << " " << maxWidth;
 }
 } // namespace App
