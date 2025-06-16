@@ -35,7 +35,7 @@ class MainWindow : public QMainWindow {
     QLabel *_scaleLabel;
     //utils
     EditorSettings _displayOptions;
-    size_t imageIndex = 0;
+    size_t _imageIndex = 0;
 
   public:
     explicit MainWindow(QWidget *parent = nullptr);
@@ -45,8 +45,9 @@ class MainWindow : public QMainWindow {
     void updatePathLabel(const Image &image);
     void updateScaleLabel(float scale);
     void updateResolutionLabel();
-    void updateDisplayOptions(const EditorSettings &options);
+    void updateEditorSettings(const EditorSettings &options);
     void handleImageUpdate(const std::vector<Image> &images);
+    void resetTransform();
     void openFile();
     void saveFile();
   signals:

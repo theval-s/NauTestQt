@@ -43,16 +43,24 @@ void MainWindow::setupToolBar() {
     if (_openAction) toolbar->QWidget::addAction(_saveAction);
     QAction *zoomInAction = new QAction("Zoom In", toolbar);
     QAction *zoomOutAction = new QAction("Zoom Out", toolbar);
+    QAction *resetAction = new QAction("Reset", toolbar);
     zoomInAction->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::ZoomIn));
+    zoomInAction->setToolTip("Zoom In");
     zoomOutAction->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::ZoomOut));
+    zoomOutAction->setToolTip("Zoom Out");
+    resetAction->setIcon(QIcon::fromTheme(QIcon::ThemeIcon::EditClear));
+    resetAction->setToolTip("Reset image transform");
     if (_viewport) {
         connect(zoomInAction, &QAction::triggered, _viewport,
                 &ViewportWidget::zoomIn);
         connect(zoomOutAction, &QAction::triggered, _viewport,
                 &ViewportWidget::zoomOut);
+        connect(resetAction, &QAction::triggered, this, &MainWindow::resetTransform);
     }
+
     toolbar->addAction(zoomInAction);
     toolbar->addAction(zoomOutAction);
+    toolbar->addAction(resetAction);
     toolbar->addSeparator();
 }
 void MainWindow::setupUi() {
@@ -140,33 +148,33 @@ void MainWindow::connectSignals() {
 
         //from inspector
         connect(_inspector, &InspectorWidget::displayOptionsModified, this,
-                &MainWindow::updateDisplayOptions);
+                &MainWindow::updateEditorSettings);
         if (_viewport) {
             connect(_inspector, &InspectorWidget::transformModified, _viewport,
                     [this](const QTransform &transform) {
-                        _viewport->setTransform(imageIndex, transform);
+                        _viewport->setTransform(_imageIndex, transform);
                     });
             connect(_inspector, &InspectorWidget::itemVisibleModified, this,
                     [this](bool visible) {
-                        _viewport->setItemVisible(imageIndex, visible);
+                        _viewport->setItemVisible(_imageIndex, visible);
                     });
             connect(_inspector, &InspectorWidget::opacityModified, this,
                     [this](float opacity) {
-                        _viewport->setOpacity(imageIndex, opacity);
+                        _viewport->setOpacity(_imageIndex, opacity);
                     });
             connect(_inspector, &InspectorWidget::zValueModified, this,
                     [this](float zValue) {
-                        _viewport->setItemZValue(imageIndex, zValue);
+                        _viewport->setItemZValue(_imageIndex, zValue);
                     });
         }
     }
     if (_hierarchy) {
         connect(_hierarchy, &QListWidget::currentRowChanged, this,
                 [this](int row) {
-                    this->imageIndex = row;
+                    this->_imageIndex = row;
                     if (_viewport)
                         emit activeImageChanged(
-                            _viewport->getImages().at(imageIndex));
+                            _viewport->getImages().at(_imageIndex));
                 });
     }
 }
@@ -195,7 +203,7 @@ void MainWindow::updateResolutionLabel() {
         QString::number(rect.width()) + "x" + QString::number(rect.height());
     _resolutionLabel->setText(res);
 }
-void MainWindow::updateDisplayOptions(const EditorSettings &options) {
+void MainWindow::updateEditorSettings(const EditorSettings &options) {
     if (options.showPath != _displayOptions.showPath) {
         if (options.showPath) {
             _pathLabel->setVisible(true);
@@ -232,10 +240,16 @@ void MainWindow::handleImageUpdate(const std::vector<Image> &images) {
         _pathLabel->setText("Path");
         _resolutionLabel->setText("Resolution");
         _scaleLabel->setText("Scale");
-        imageIndex = 0;
+        _imageIndex = 0;
     } else if (images.size() == 1) {
-        imageIndex = 0;
-        emit activeImageChanged(images[imageIndex]);
+        _imageIndex = 0;
+        emit activeImageChanged(images[_imageIndex]);
+    }
+}
+void MainWindow::resetTransform() {
+    if (_viewport) {
+        _viewport->setTransform(_imageIndex, QTransform());
+        emit activeImageChanged(_viewport->getImages().at(_imageIndex));
     }
 }
 } // namespace App
